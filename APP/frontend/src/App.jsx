@@ -1,121 +1,88 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import React, { useContext, useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
+import { AuthContext } from './context/AuthContext';
+import api from './api';
 
-function App() {
-  const [count, setCount] = useState(0)
+// Компонент навигации
+const Navbar = () => {
+  const { user, logout, isAdmin, isEditor } = useContext(AuthContext);
+  return (
+    <nav className="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+      <div className="container">
+        <Link className="navbar-brand" to="/">My Blog</Link>
+        <div className="navbar-nav ms-auto">
+          <Link className="nav-link" to="/">Главная</Link>
+          {user ? (
+            <>
+              {isEditor && <Link className="nav-link" to="/editor">Кабинет редактора</Link>}
+              {isAdmin && <Link className="nav-link" to="/admin">Админка</Link>}
+              <button className="btn btn-outline-light ms-2" onClick={logout}>Выйти ({user.username})</button>
+            </>
+          ) : (
+            <Link className="nav-link" to="/login">Войти</Link>
+          )}
+        </div>
+      </div>
+    </nav>
+  );
+};
+
+// Страница входа
+const Login = () => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const { login } = useContext(AuthContext);
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await login(username, password);
+      window.location.href = '/';
+    } catch (err) {
+      setError('Неверный логин или пароль');
+    }
+  };
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <div className="container" style={{maxWidth: '400px'}}>
+      <h2 className="mb-3">Вход</h2>
+      {error && <div className="alert alert-danger">{error}</div>}
+      <form onSubmit={handleSubmit}>
+        <div className="mb-3">
+          <label className="form-label">Логин</label>
+          <input className="form-control" value={username} onChange={e => setUsername(e.target.value)} required />
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
+        <div className="mb-3">
+          <label className="form-label">Пароль</label>
+          <input className="form-control" type="password" value={password} onChange={e => setPassword(e.target.value)} required />
         </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+        <button className="btn btn-primary w-100" type="submit">Войти</button>
+      </form>
+      <p className="mt-3">Дефолтный админ: admin / admin123</p>
+    </div>
+  );
+};
 
-      <div className="ticks"></div>
+// Заглушка главной
+const Home = () => (
+  <div className="container">
+    <h1>Добро пожаловать в блог!</h1>
+    <p>Тут будут отображаться статьи из вашей базы Firebird.</p>
+  </div>
+);
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+function App() {
+  return (
+    <Router>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
+    </Router>
+  );
 }
 
-export default App
+export default App;
