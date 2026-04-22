@@ -2,8 +2,8 @@ package com.curs.blog.controller;
 
 import com.curs.blog.dto.ArticleDto;
 import com.curs.blog.dto.UserDto;
-import com.curs.blog.facade.ArticleFacade;
-import com.curs.blog.facade.UserFacade;
+import com.curs.blog.facade.IArticleFacade;
+import com.curs.blog.facade.IUserFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -17,10 +17,10 @@ import java.util.List;
 public class AdminController {
 
     @Autowired
-    private UserFacade userFacade;
+    private IUserFacade userFacade;
 
     @Autowired
-    private ArticleFacade articleFacade;
+    private IArticleFacade articleFacade;
 
     @GetMapping("/users")
     public List<UserDto> getAllUsers() {

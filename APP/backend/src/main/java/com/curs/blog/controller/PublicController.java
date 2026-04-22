@@ -3,7 +3,7 @@ package com.curs.blog.controller;
 import com.curs.blog.dto.ArticleDto;
 import com.curs.blog.dto.CategoryDto;
 import com.curs.blog.dto.TagDto;
-import com.curs.blog.facade.ArticleFacade;
+import com.curs.blog.facade.IArticleFacade;
 import com.curs.blog.service.CategoryService;
 import com.curs.blog.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 public class PublicController {
 
     @Autowired
-    private ArticleFacade articleFacade;
+    private IArticleFacade articleFacade;
 
     @Autowired
     private CategoryService categoryService;

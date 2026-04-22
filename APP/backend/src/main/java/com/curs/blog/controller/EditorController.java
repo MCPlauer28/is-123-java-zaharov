@@ -6,10 +6,11 @@ import com.curs.blog.dto.MessageResponse;
 import com.curs.blog.dto.TagDto;
 import com.curs.blog.entity.Category;
 import com.curs.blog.entity.Tag;
-import com.curs.blog.facade.ArticleFacade;
+import com.curs.blog.facade.IArticleFacade;
 import com.curs.blog.security.UserDetailsImpl;
 import com.curs.blog.service.CategoryService;
 import com.curs.blog.service.TagService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,7 +26,7 @@ import java.util.List;
 public class EditorController {
 
     @Autowired
-    private ArticleFacade articleFacade;
+    private IArticleFacade articleFacade;
 
     @Autowired
     private CategoryService categoryService;
@@ -40,13 +41,13 @@ public class EditorController {
     }
 
     @PostMapping("/articles")
-    public ArticleDto createArticle(@RequestBody ArticleDto articleDto, Authentication authentication) {
+    public ArticleDto createArticle(@Valid @RequestBody ArticleDto articleDto, Authentication authentication) {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         return articleFacade.createArticle(articleDto, userDetails.getId());
     }
 
     @PutMapping("/articles/{id}")
-    public ResponseEntity<ArticleDto> updateArticle(@PathVariable Long id, @RequestBody ArticleDto articleDto, Authentication authentication) {
+    public ResponseEntity<ArticleDto> updateArticle(@PathVariable Long id, @Valid @RequestBody ArticleDto articleDto, Authentication authentication) {
         ArticleDto existing = articleFacade.getArticleById(id);
         if (existing == null) return ResponseEntity.notFound().build();
         
